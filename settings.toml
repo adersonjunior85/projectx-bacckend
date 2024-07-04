@@ -1,0 +1,52 @@
+[default]
+# Environments for default use in application
+TITLE="PROJECT X - Default"
+ROOT_PATH="" # Root path for application -> api-gateway
+VERSION="0.1.0"
+HOST="0.0.0.0"
+PORT=8080
+RELOAD=false
+LOG_LEVEL="INFO"
+DESCRIPTION="Return of project-x-api application"
+WORKERS=3
+ALLOWED_ORIGINS=["*"]
+MINHA_RECEITA_API="https://minhareceita.org"
+TIMEOUT=30
+ELASTIC_APM_SERVICE_NAME="project-x"
+REDIS_TIMEOUT=3660
+DELAY=15
+TRIES=3
+REDIS_HOST = "localhost"
+REDIS_PORT = 6379
+REDIS_DB = 0
+REDIS_PASSWORD = ""
+EXPIRATION_HOURS = 1
+
+[default.redis]
+    host="10.177.237.99"
+
+[testing]
+# Environments testing use in application
+TITLE="PROJECT X - Testing"
+
+[development]
+# Environments development use in application
+TITLE="PROJECT X - Development"
+RELOAD=true
+LOG_LEVEL="DEBUG"
+
+[homologation]
+# Environments homologation use in application
+TITLE="PROJECT X - Homologation"
+LOG_LEVEL="DEBUG"
+
+[staging]
+# Environments staging use in application
+TITLE="PROJECT X - Staging"
+
+[production]
+# Environments production use in application
+TITLE="PROJECT X - Production"
+URL_AUTH_JWT=""
+ELASTIC_APM_ENABLED="true"
+REDIS_TIMEOUT=3600

@@ -1,0 +1,38 @@
+include:
+  - project: TruckPad/sre/pipelines
+    ref: main
+    file:
+      - ci_includes/lint-testing-python.yml
+      - ci_includes/gitlab-sast.yml
+      - ci_includes/deployment--main-envs.yml
+      - ci_includes/deployment--subset-envs.yml
+      - ci_includes/post--create-release.yml
+
+lint-and-testing:
+  image: us-docker.pkg.dev/truckpad-176922/apps/golden/python:3.12.3-bookworm
+  services:
+    - postgres:latest
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+    POSTGRES_DB: postgres_test
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres
+    ENV_FOR_DYNACONF: "testing"
+    POSTGRES_HOST_AUTH_METHOD: trust
+    ELASTIC_APM_ENABLED: "false"
+    API_ENV: testing
+  before_script:
+    - apt-get update && apt-get install -y postgresql-client
+#     Pipe falha: psql: error: connection to server at "127.0.0.1", port 5432 failed: Connection refused
+#    - psql -U postgres -h 127.0.0.1 -p 5432 -c "CREATE ROLE vpo SUPERUSER LOGIN;"
+#    - psql -U postgres -h 127.0.0.1 -p 5432 -c "CREATE DATABASE vpo;"
+#    - psql -U postgres -h 127.0.0.1 -p 5432 -d vpo -c "CREATE SCHEMA vpo;"
+    - cp -n .example.secrets.toml .secrets.toml
+    - pip install --upgrade pip
+    - pip install poetry
+    - poetry install --no-root
+  script:
+    - poetry run pre-commit run -a
+#    - poetry run alembic -c alembic.ini upgrade head
+    - poetry run pytest
+  when: manual

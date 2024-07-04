@@ -1,0 +1,101 @@
+app:
+  name: project-x
+  subset: main
+  commit: $DEPLOY_VERSION
+
+image:
+  registry: us-docker.pkg.dev/truckpad-176922/apps/
+  name: $CI_PROJECT_NAME
+
+environment:
+  API_ENV: $API_ENV
+
+service:
+  targetPort: 8080
+  istio: ingressgateway
+  maxRetries: 0
+  hosts:
+    - name: project-x.homolog.truckpad.io
+      namespace: homolog
+      cert: tls-nonprod-truckpad-io
+    - name: project-x.staging.truckpad.io
+      namespace: staging
+      cert: tls-nonprod-truckpad-io
+    - name: project-x.truckpad.io
+      namespace: production
+      cert: tls-prod-truckpad-io
+
+secrets:
+  - elastic-apm-env-vars
+  - database-vpo-fms-database
+
+resources:
+  istio_proxy:
+    limits:
+      cpu: 128m
+      memory: 128Mi
+    requests:
+      cpu: 32m
+      memory: 96Mi
+    production:
+      limits:
+        cpu: 128m
+        memory: 256Mi
+      requests:
+        cpu: 64m
+        memory: 128Mi
+  api:
+    limits:
+      cpu: 128m
+      memory: 640Mi
+    requests:
+      cpu: 96m
+      memory: 512Mi
+    production:
+      limits:
+        cpu: 256m
+        memory: 896Mi
+      requests:
+        cpu: 128m
+        memory: 640Mi
+    livenessProbe:
+      enabled: true
+      path: /v1/health/liveness
+      port: 80
+      initialDelaySeconds: 30
+      timeoutSeconds: 5
+    readinessProbe:
+      enabled: true
+      path: /v1/health/readiness
+      port: 80
+      timeoutSeconds: 5
+      periodSeconds: 10
+      successThreshold: 1
+      failureThreshold: 3
+    startupProbe:
+      enabled: true
+      path: /v1/health/liveness
+      port: 80
+
+healthCheck:
+  startupPath: /v1/health/liveness
+  livenessPath: /v1/health/liveness
+  readinessPath: /v1/health/readiness
+
+hpa:
+  api:
+    minReplicas: 1
+    maxReplicas: 2
+    targetCPU: 75
+    desired: 2
+    production:
+      desired: 2
+      minReplicas: 2
+      maxReplicas: 8
+      targetCPU: 70
+
+deployments:
+  - kind: api
+    fullname: project-x-api
+    environment:
+      ELASTIC_APM_SERVICE_NAME: project-x-api

@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+#  app:
+#    container_name: fms-vpo
+#    build: .
+#    volumes:
+#      - .:/app
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      db:
+#        condition: service_healthy
+#      redis:
+#        condition: service_healthy
+
+  db:
+    container_name: postgres_db
+    image: postgres:15.3-alpine
+    environment:
+      - POSTGRES_USER=vpo
+      - POSTGRES_PASSWORD=vpo
+      - POSTGRES_DB=vpo
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "vpo"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+
+  redis:
+    container_name: redis
+    image: redis:7.2.1-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
