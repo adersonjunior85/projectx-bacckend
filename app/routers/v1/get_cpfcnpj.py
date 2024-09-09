@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Depends, status
-from fastapi.security import HTTPBearer
+from fastapi import APIRouter, status
 
 # from app.common.auth import AuthUser
 from app.services.get_cpfcnpj import GetCpfCnpj

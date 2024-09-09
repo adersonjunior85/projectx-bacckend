@@ -1,7 +1,7 @@
 from fastapi.routing import APIRouter
 
-from app.routers.v1.health_check import health_router
 from app.routers.v1.get_cpfcnpj import getcpfcnpj_route
+from app.routers.v1.health_check import health_router
 
 router = APIRouter(prefix="/v1", redirect_slashes=True)
 
